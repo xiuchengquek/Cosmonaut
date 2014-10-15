@@ -38,7 +38,7 @@ def default_drmaa_specification(jobAttempt):
         return '-R "rusage[mem={0}] span[hosts=1]" -n {1} -W 0:{2} -q {3}'.format(mem_req, cpu_req, time_req, queue)
 
     elif drm == 'GE':
-        return '-l spock_mem={mem_req}M,num_proc={cpu_req}'.format(mem_req=mem_req, cpu_req=cpu_req)
+        return '-l h_vmem={mem_req}M -pe smp {cpu_req}'.format(mem_req=mem_req, cpu_req=cpu_req)
 
     else:
         raise Exception('DRM not supported')
