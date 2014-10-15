@@ -144,7 +144,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Cosmonaut.iml" filepath="$PROJECT_DIR$/Cosmonaut.iml" />
+      <module fileurl="file://$PROJECT_DIR$/COSMOSNAULT.iml" filepath="$PROJECT_DIR$/COSMOSNAULT.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Python 3.4.1 virtualenv at ~/sandbox" project-jdk-type="Python SDK">
