@@ -1,0 +1,90 @@
+{% load extras %}
+
+{% if paged_tasks.paginator.num_pages > 1 %}
+    {% if paged_tasks.paginator.page_range|length <= 10 %}
+    <div class="pagination">
+    {%else%}
+    <div class="pagination_big">
+    {%endif%}
+        <span class="step-links">
+            <ul>
+            {% if paged_tasks.has_previous %}
+                <li><a href="?page={{ paged_tasks.previous_page_number }}&{{filter_url}}">«</a></li>
+            {% endif %}
+            {% for pagenum in paged_tasks.paginator.page_range%}
+                <li {%if pagenum == paged_tasks.number%}class="active"{%endif%}><a href="?page={{pagenum}}&{{filter_url}}">{{pagenum|add:"-1"|mult:page_size|add:"1"}} -
+                {%if forloop.last %} {{paged_tasks.paginator.count}}
+                {%else%}
+                 {{pagenum|mult:page_size}}{%endif%}</a>{% if paged_tasks.paginator.page_range|length > 10 %}, {%endif%}</li>
+                {%endfor %}
+    
+            {% if paged_tasks.has_next %}
+                <li><a href="?page={{ paged_tasks.next_page_number }}&{{filter_url}}">»</a></li>
+            {% endif %}
+            </ul>
+        </span>
+    </div>
+{% endif %}
+
+<table class="table table-condensed table-striped">
+    <thead>
+    <tr>
+        <th>Task</th>
+        {%if False%}
+        <th>Parents</th>
+        {%endif%}
+        <th>Status</th>
+        <th>Wall Time</th>
+        <th>Output Dir Size</th>
+        <th>Job Attempts</th>
+    </tr>
+    </thead><tbody>
+    {% for task in paged_tasks %}
+        <tr>
+            <td>
+                {%with status=task.status %}
+                    {%if status == "successful"%}<i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>{%endif%}
+                    {%if status == "failed"%}<i class="icon-thumbs-down" rel="tooltip" title="Failed"></i>{%endif%}
+                    {%if status == "in_progress"%}<i class="icon-refresh" rel="tooltip" title="In Progress"></i>{%endif%}
+                {%endwith%} 
+            <strong><a href="{{task.url}}">{{task}}</a></strong>
+            </td>
+            {%if False%}
+            <td>
+                {%for parent in task.parents%}
+                <a href="{{parent.url}}">{{parent}}{%if not forloop.last%}<br/>{%endif%}</a>
+                {%empty%}None{%endfor%}
+            </td>
+            {%endif%}
+            <td>{{task.status}}
+            </td>
+            <td>
+                {{task.wall_time|format_time}}
+            </td>
+            <td>
+                {%if cosmos_settings.show_task_file_sizes == "True"%}{{task.output_file_size}}{%else%}off{%endif%}
+            </td>
+            <td>
+                {% for j in task.jobAttempts %}
+                        {% with qs=j.queue_status %}
+                            {%if j.successful%}<i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>{%else%}
+                            {%if qs == "finished"%}<i class="icon-thumbs-down" rel="tooltip" title="Successful"></i>{%endif%}{%endif%}
+                            {%if qs == 'queued'%}<i class="icon-time" rel="tooltip" title="Job is Queued"></i>
+                                {%with ds=j.get_status %}
+                                    {%if ds == 'job is running'%}<i class="icon-refresh" rel="tooltip" title="Job is running"></i>{%endif%}
+                                    {%if ds == 'not sure'%}<i class="icon-question-sign" rel="tooltip" title="Not sure"></i>{%endif%}
+                                {% endwith%}
+                            {%endif%}
+                        {% endwith%}
+                        <a href="{{j.url}}">{{ j }}</a><br/>
+                {% empty %}
+                  No job attempts in this task.
+                {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    {% empty %}
+      <tr><td>No tasks.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

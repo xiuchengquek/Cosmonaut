@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load extras %}
+{%block content%}
+
+<div class="box-header">
+    <h2><i class="icon-tasks"></i><span class="break"></span>Workflows</h2>
+</div>
+<div id="stages" class="box-content">
+
+    <table class="table table-hover table-condensed">
+        <thead><tr>
+            <th>Name</th>
+            <th>Created On</th>
+            <th>Finished On</th>
+            <th>Wall Time</th>
+        </tr></thead><tbody>
+        {% for workflow in workflows %}
+        <tr>
+            <td><a href="{{workflow.url}}"><strong>{{ workflow }}</strong></a></td>
+            <td>{{workflow.created_on|date:"SHORT_DATETIME_FORMAT"}}</td>
+            <td>{{workflow.finished_on|date:"SHORT_DATETIME_FORMAT"}}</td>
+            <td>{{workflow.wall_time}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{%endblock%}

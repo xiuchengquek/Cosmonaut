@@ -1,0 +1,33 @@
+.pagination_big ul {
+	list-style-type: none;
+	padding: 0px;
+}
+.pagination_big li {
+	display:inline;
+	padding-right: 5px;
+}
+
+.breadcrumb > li.active {
+    color: #FFFFFF;
+    text-shadow:none;
+    font-weight: bold;
+}
+
+a {
+    color: rgb(0, 153, 221);
+}
+
+
+body {
+    background: url("/static/img/bg-light.jpg") repeat scroll 0 0 transparent;
+    color: #646464;
+}
+
+.breadcrumb {
+    margin-top: 0;
+}
+
+.filepath {
+    color:#B94A48;
+    font-weight:bold;
+}

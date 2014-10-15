@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load extras %}
+
+{%block title%} - {{task.workflow.name}}{%endblock%}
+
+{%block content%}
+
+
+<ul class="breadcrumb">
+  <li><a href="/Workflow/">Workflows</a> <span class="divider">/</span></li>
+  <li><a href="{{task.stage.workflow.url }}">{{task.stage.workflow}}</a> <span class="divider">/</span></li>
+  <li><a href="{{task.stage.url }}">{{task.stage}}</a><span class="divider">/</span></li>
+  <li class="active">{{task}}</li>
+</ul>
+
+
+<div class="box-header">
+    <h2>
+        {%if task.status == "successful"%}
+        <i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>
+        {%endif%}
+        {%if task.status == "failed"%}
+        <i class="icon-thumbs-down" rel="tooltip" title="Failed"></i>
+        Failed
+        {%endif%}
+        {%if task.status == "in_progress"%}
+        <i class="icon-refresh" rel="tooltip" title="Warning"></i>
+        {%endif%}
+
+        <span class="break"></span>
+        {{task}}
+        </h1>
+    </h2>
+</div>
+<div class="box-content">
+
+    <strong>Tags</strong>:
+    {% for k,v in task.tags.items %}
+    <span class="label label-info">{{k}}:{{v}}</span>
+    {%empty%}
+    None
+    {% endfor %}
+
+    <dl class="dl-horizontal dl-multicolumn" data-colcount="2">
+    <dt>Status</dt><dd><em>{{task.status}}</em></dd>
+    <dt>Preformatted<br/>Command</dt><dd><pre class="pre-scrollable">{{task.pcmd}}</pre></dd>
+    <dt>Parents</dt><dd>
+        {%for parent in task.parents%}
+        <a href="{{parent.url}}">{{parent}}{%if not forloop.last%},{%endif%}</a>
+        {%empty%}None{%endfor%}
+    </dd>
+    <dt>CPU Requirement</dt><dd>{{task.cpu_requirement}}</dd>
+    <dt>Memory Requirement</dt><dd>{{task.memory_requirement}}MB</dd>
+    <dt>Time Requirement</dt><dd>{{task.time_requirement}} min</dd>
+    <dt>File Size</dt><dd>{%if cosmos_settings.show_task_file_sizes == "True"%}{{task.output_file_size}}{%else%}off{%endif%}</dd>
+    <dt>Wall time</dt><dd>{{task.wall_time|format_time}}</dd>
+    <dt>Successful</dt><dd>{{task.successful}}</dd>
+    <dt>NOOP</dt><dd>{{task.NOOP}}</dd>
+    <dt>Succeed On Failure</dt><dd>{{task.succeed_on_failure}}</dd>
+    <dt>Created On</dt><dd>{{task.created_on}}</dd>
+    <dt>Finished On</dt><dd>{{task.finished_on}}</dd>
+    <dt>Output Directory</dt><dd><code>{{task.output_dir}}</code></dd>
+    <dt>Output Files</dt><dd>
+        {%for of in task.output_files%}
+            <a href="{{of.url}}">{{of}}{%if not forloop.last%}<br/>{%endif%}</a>
+        {%empty%}None{%endfor%}
+    </dd>
+
+
+    </dl>
+
+    <h3>JobAttempts ({{jobAttempts_list|length}})</h3>
+    {% if jobAttempts_list|length == 1 %}
+        {% with jobAttempt=jobAttempts_list.0 %}
+        {% include "JobManager/JobAttempt/jobattempt.html" %}
+        {% endwith %}
+    {%else%}
+        {% for j in jobAttempts_list %}
+        <ul>
+            <li style="list-style-type:none">
+                {%if j.successful%}<i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>{%else%}
+                {%if j.queue_status == "completed"%}<i class="icon-thumbs-down" rel="tooltip" title="Successful"></i>{%endif%}{%endif%}
+                {%if j.queue_status == 'queued'%}<i class="icon-time" rel="tooltip" title="Job is Queued"></i>{%endif%}
+                {%if j.get_status == 'job is running'%}<i class="icon-refresh" rel="tooltip" title="Job is running"></i>{%endif%}
+                {%if j.get_status == 'not sure'%}<i class="icon-question-sign" rel="tooltip" title="Not sure"></i>{%endif%}
+
+                <a href="{{j.url}}">{{ j }}</a>
+            </li>
+        </ul>
+        {% empty %}
+          No job attempts in this task.
+        {% endfor %}
+    {%endif%}
+</div>
+{% endblock %}

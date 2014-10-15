@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load extras %}
+{% load url from future %}
+{% block title%} - {{stage.workflow.name}}{%endblock%}
+{%block style%}
+    ul.dropdown-form {
+      list-style-type: none; 
+      list-style: none outside none;
+      line-height: 20px;
+      padding-right:25px;
+      text-align:right
+    }
+    ul.dropdown-form >li {
+      margin:5px;
+    }
+{%endblock%}
+
+{% block head %}
+    <!--<script type="text/javascript">
+    $(document).ready(function() {
+        update_html = function(selector,urlfunc){
+            //updates selector with the html from url every second
+                jQuery.ajax({
+                     url:    urlfunc(),
+                     success: function(result) {
+                                  $(selector).html(result)
+                                  setTimeout("update_html('"+selector+"',"+urlfunc+")",1000)
+                              },
+                     async:   true,
+                }); 
+            }
+        // url_stage_table = function() { return '{% url 'stage_table' stage.id %}' }
+        // update_html('#stage_table',url_stage_table)
+        // url_task_table = function() { return '{% url 'stage_task_table' stage.id %}?'+$('#filter_form').serialize() }
+        // update_html('#task_table',url_task_table)
+        
+        //Filter Submit Button
+        $('#filter_submit').click(function() {
+            $('#filter_dropdown-toggle').dropdown('toggle')
+            $('#task_table').load('{% url 'stage_task_table' stage.id %}?'+$('#filter_form').serialize() );
+            return false;
+        });
+    });
+    </script>-->
+{% endblock %}
+
+{%block content%}
+    <p>
+<ul class="breadcrumb">
+  <li><a href="/Workflow/">Workflows</a> <span class="divider">/</span></li>
+  <li><a href="{{stage.workflow.url }}">{{stage.workflow}}</a> <span class="divider">/</span></li>
+  <li class="active">{{stage}}</li>
+</ul>
+</p>
+
+<div class="box-header">
+    <h2>
+        {%if stage.status == "successful"%}
+        <i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>
+        {%endif%}
+        {%if stage.status == "failed"%}
+        <i class="icon-thumbs-down" rel="tooltip" title="Failed"></i>
+        Failed
+        {%endif%}
+        {%if stage.status == "in_progress"%}
+        <i class="icon-refresh" rel="tooltip" title="Warning"></i>
+        {%endif%}
+        <span class="break"></span>
+        {{stage}}
+    </h2>
+</div>
+<div id="stages" class="box-content">
+    <div id="stage_table">
+        {% with details=1 stages=stage|aslist%}
+        {%include "Workflow/Stage/table.html"%}
+        {% endwith %}
+    </div>
+
+
+<div class="box-header">
+    <h2><i class="icon-tasks"></i><span class="break"></span>
+        Tasks
+    </h2>
+</div>
+<div class="box-content">
+    <div class="dropdown">
+        <h3 style="display:inline" class="dropdown-toggle" data-toggle="dropdown"  id="filter_dropdown-toggle">
+            <button class="btn btn-inverse">Filter
+                <span class="caret"></span>
+            </button>
+        </h3>
+
+        <div class="dropdown dropdown-menu" role="menu"  aria-labelledby="dLabel">
+            <form method="GET" action="{{ request.url }}" class="form-inline" id="filter_form">
+                <input type="hidden" name="filter" value="True"/>
+                {% csrf_token %}
+                <ul class="dropdown-form">
+                    {% for key,values in filter_choices.items %}
+                    <li>
+                        <label class="control-label" for="id_{{key}}">{%if key == "f_status"%}status{%else%}{{key}}{%endif%}</label>
+                        <select id="id_{{key}}" name="{{key}}">
+                            <option value="{{v}}"{% if current_filters.key == "" %}selected="selected"{%endif%}></option>
+                            {%for v in values%}
+                            <option value="{{v}}"{%if current_filters|key2val:key == v %}selected="selected"{%endif%}>{{v}}</option>
+                            {%endfor%}
+                        </select>
+                    </li>
+                    {%endfor%}
+                    <li class="divider">
+                    </li>
+                    <li>
+                        <input type="submit" value="filter" class="btn" id="filter_submit">
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+    <br/>
+    {% include "Workflow/Task/table.html" %}
+</div>
+
+</div>
+{% endblock %}

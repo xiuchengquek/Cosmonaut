@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{%block content%}
+<h1>LSF Info</h1>
+<fieldset><legend>bjobs</legend>
+<pre class="pre-scrollable">{{bjobs}}</pre>
+</fieldset>
+<fieldset><legend>bqueues</legend>
+<pre class="pre-scrollable">{{bqueues}}</pre>
+</fieldset>
+
+<fieldset><legend>lsload</legend>
+<pre class="pre-scrollable">{{lsload}}</pre>
+</fieldset>
+<fieldset><legend>lshosts</legend>
+<pre class="pre-scrollable">{{lshosts}}</pre>
+</fieldset>
+<fieldset><legend>bhosts</legend>
+<pre class="pre-scrollable">{{bhosts}}</pre>
+</fieldset>
+<fieldset><legend>bhosts -l</legend>
+<pre class="pre-scrollable">{{bhosts_l}}</pre>
+</fieldset>
+{%endblock%}

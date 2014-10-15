@@ -1,0 +1,62 @@
+{% load extras %}
+
+<table class="table table-condensed table-hover">
+    <tbody>
+    <tr><th>Step</th>
+        <th>Stage</th>
+        <th></th>
+        <th>Progress</th>
+        <th>Tasks</th>
+        <th>Stage Wall Time</th>
+        <th>Avg CPU Req</th>
+        <th>Avg % CPU</th>
+        <th>Avg Task Wall Time</th>
+        <th>Max Task Wall Time</th>
+        <th>Total Task Wall Time</th>
+        <th>Avg Blocked I/O Time</th>
+        
+        <th>Avg Mem Req</th>
+        <th>Avg RSS</th>
+        <th>Max RSS</th>
+        <th>Avg Virtual Ram</th>
+        
+        {% if details %}
+        <th>Created</th>
+        <th>Finished</th>
+        {% endif %}
+    </tr>
+    {% for stage in stages %}
+        <tr onclick="window.location.href = '{{stage.url}}';" style="cursor:pointer">
+            <td>{{stage.order_in_workflow}}.</td>
+            <td>[{{stage.id}}] <strong>{{stage.name|underscore2space}}</strong></td>
+            <td>
+                {%with status=stage.status %}
+                    {%if status == "successful"%}<i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>{%endif%}
+                    {%if status == "failed"%}<i class="icon-thumbs-down" rel="tooltip" title="Failed"></i>{%endif%}
+                    {%if status == "in_progress"%}<i class="icon-refresh" rel="tooltip" title="In Progress"></i>{%endif%}
+                {%endwith%}
+                </td>
+            <td><div style="padding:0px;margin:0px" class="progress progress-{% status2csstype stage.status %} progress-striped" rel="tooltip" title="{{stage.percent_done}}% Completed" data-placement="right">
+                    <div class="bar" style="opacity:.75;width:{{stage.percent_done}}%"%></div>
+                </div></td>
+            <td>{{stage.num_tasks_successful}}/{{stage.num_tasks}}</td>
+            <td>{{stage.wall_time}}</td>
+            <td>{% get_task_stat stage "cpu_requirement" "Avg"%}</td>
+            <td>{% get_sjob_stat stage "percent_cpu" "Avg" "convert2int"%}</td>
+            <td>{% get_sjob_stat stage "wall_time" "Avg" "format_time"%}</td>
+            <td>{% get_sjob_stat stage "wall_time" "Max" "format_time"%}</td>
+            <td>{% get_sjob_stat stage "wall_time" "Sum" "format_time"%}</td>
+            <td>{% get_sjob_stat stage "block_io_delays" "Avg" "format_time"%}</td>
+            
+            <td>{% get_task_stat stage "memory_requirement" "Avg" "format_memory_mb"%}</td>
+            <td>{% get_sjob_stat stage "avg_rss_mem" "Avg" "format_memory_kb"%}</td>
+            <td>{% get_sjob_stat stage "max_rss_mem" "Max" "format_memory_kb"%}</td>
+            <td>{% get_sjob_stat stage "avg_virtual_mem" "Avg" "format_memory_kb"%}</td>
+            {% if details %}
+               <td>{{stage.created_on|date:"SHORT_DATETIME_FORMAT"}}</td>
+               <td>{{stage.finished_on|date:"SHORT_DATETIME_FORMAT"}}</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

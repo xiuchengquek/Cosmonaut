@@ -1,0 +1,138 @@
+{% load extras %}
+
+
+
+<div class="box-header">
+    <h2>
+        {% with qs=jobAttempt.queue_status %}
+            {%if jobAttempt.successful%}<i class="icon-thumbs-up" rel="tooltip" title="Successful"></i>{%else%}
+            {%if qs == "finished"%}<i class="icon-thumbs-down" rel="tooltip" title="Successful"></i>{%endif%}{%endif%}
+            {%if qs == 'queued'%}<i class="icon-time" rel="tooltip" title="Job is Queued"></i>
+            {%with ds=jobAttempt.get_status %}
+            {%if ds == 'job is running'%}<i class="icon-refresh" rel="tooltip" title="Job is running"></i>{%endif%}
+            {%if ds == 'not sure'%}<i class="icon-question-sign" rel="tooltip" title="Not sure"></i>{%endif%}
+        {% endwith%}
+        {%endif%}
+        {% endwith%}
+        <span class="break"></span>
+        {{jobAttempt}}
+    </h2>
+</div>
+<div class="box-content">
+
+
+<ul class="breadcrumb">
+  <li><a href="/Workflow/">Workflows</a> <span class="divider">/</span></li>
+  <li><a href="{{jobAttempt.task.stage.workflow.url }}">{{jobAttempt.task.stage.workflow}}</a> <span class="divider">/</span></li>
+  <li><a href="{{jobAttempt.task.stage.url }}">{{jobAttempt.task.stage}}</a><span class="divider">/</span></li>
+  <li><a href="{{jobAttempt.task.url }}">{{jobAttempt.task}}</a><span class="divider">/</span></li>
+  <li class="active">{{jobAttempt}}</li>
+</ul>
+
+
+    <dl class="dl-horizontal dl-multicolumn" data-colcount="2">
+    <dt>Status</dt><dd>
+        {% with qs=jobAttempt.queue_status %}
+        {%if jobAttempt.successful%}<p class="label label-success">
+        <i class="icon-thumbs-up" rel="tooltip" title="Successful"></i> Successful </p>
+        {%else%}
+        {%if qs == "finished"%}
+        <p class="label label-important">
+        <i class="icon-thumbs-down" rel="tooltip" title="Failed"></i> Failed
+        </p>
+        {%endif%}{%endif%}
+        {%if qs == 'queued'%}
+        <p class="label label-info">
+        <i class="icon-time icon-white" rel="tooltip" title="Job is Queued"></i> Job is Queued
+        </p>
+        {%with ds=jobAttempt.get_status %}
+        {%if ds == 'job is running'%}
+        <p class="label label-warning">
+            <i class="icon-refresh icon-white" rel="tooltip" title="Job is Running"></i> Job is Running
+        </p>
+        {%endif%}
+        {%if ds == 'not sure'%}
+        <p class="label label-error">
+            <i class="icon-question-sign icon-white" rel="tooltip" title="Not sure"></i> Not Sure
+        </p>
+        {%endif%}
+        {% endwith%}
+        {%endif%}
+        {% endwith%}
+    </dd>
+    <dt>Status Details</dt><dd>{{jobAttempt.status_details}}</dd>
+    <dt>Shell Script</dt><dd><pre class="linenums">{{jobAttempt.get_command_shell_script_text}}</pre></dd>
+    <dt><em>Profile</em> Output</dt><dd><a href="{% url 'jobAttempt_profile_output' jobAttempt.id%}"><code>{{jobAttempt.profile_output_path}}</code></a></dd>
+    <dt>Output Directory</dt><dd><code>{{jobAttempt.task.job_output_dir}}</code></dd>
+    <dt>Task Output File Size</dt><dd>{%if cosmos_settings.show_task_file_sizes%}{{jobAttempt.task.output_file_size|b2e}}{%else%}off{%endif%}</dd>
+    <dt>Output Files</dt><dd>
+        {%for of in jobAttempt.task.output_files%}
+        <a href="{{of.url}}">{%if of.path%}{{of.path}}{%else%}{{of}}{%endif%}{%if not forloop.last%}<br/>{%endif%}</a>
+        {%empty%}None{%endfor%}
+    </dd>
+
+    <dt>Successful</dt>    <dd>{{jobAttempt.successful|b2e}}</dd>
+    <dt>Queue_status</dt>  <dd>{{jobAttempt.queue_status|b2e}}</dd>
+    <dt>Created On</dt>  <dd>{{jobAttempt.created_on|b2e}}</dd>
+    <dt>Finished On</dt>  <dd>{{jobAttempt.finished_on|b2e}}</dd>
+    <dt>Drmaa JobID</dt>  <dd>{{jobAttempt.drmaa_jobID|b2e}}</dd>
+    <dt>Drmaa status</dt>  <dd>{{jobAttempt.get_status|b2e}}</dd>
+    <dt>Drmaa native<br/>specification</dt>  <dd>{{jobAttempt.drmaa_native_specification|b2e}}</dd>
+    <dt>Drmaa info</dt>  <dd><pre class="code">{{jobAttempt.extra_jobinfo|pprint}}</pre></dd>
+    </dl>
+</div>
+
+<br/>
+
+<div class="row-fluid">
+    <div class="box span6">
+        <div class="box-header">
+            <h2><i class="icon-volume-up"></i><span class="break"></span>
+                STDOUT
+            </h2>
+        </div>
+        <div class="box-content">
+            <p class="filepath">{{jobAttempt.STDOUT_filepath}}</p>
+            <pre class="pre-scrollable alert alert-info">{{jobAttempt.STDOUT_txt}}</pre>
+        </div>
+    </div>
+
+    <div class="box span6">
+        <div class="box-header">
+            <h2><i class="icon-volume-off"></i><span class="break"></span>
+                STDERR
+            </h2>
+        </div>
+        <div class="box-content">
+            <p class="filepath">{{jobAttempt.STDERR_filepath}}</p>
+            <pre class="pre-scrollable alert alert-error">{{jobAttempt.STDERR_txt}}</pre>
+        </div>
+    </div>
+</div>
+<br/>
+
+<div class="box-header">
+    <h2><i class="icon-wrench"></i><span class="break"></span>
+        Resource Usage
+    </h2>
+
+</div>
+<div class="box-content">
+    <table class="table table-condensed tab">
+        <thead>
+        <tr><th>Name</th><th style="padding:0 35px">Value</th><th style="padding:0 35px">Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+        {%for name,val,help,type in jobAttempt.resource_usage %}
+        <tr>
+            <td style="vertical-align:middle"><em>{{name|underscore2space}}</em></td>
+            <td style="padding:0 35px; vertical-align:middle">{% format_resource_usage name val help %}</td>
+            <td style="padding:0 35px; vertical-align:middle">{{type}}</td>
+            <td><small>{{help}}</small></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No Resource Usage Data.</td></tr>
+        {%endfor%}
+        </tbody>
+    </table>
+</div>

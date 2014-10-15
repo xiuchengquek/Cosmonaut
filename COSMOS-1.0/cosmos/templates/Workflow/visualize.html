@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load extras %}
+
+{% block head %}
+{% endblock %}
+{%block content%}
+
+
+<ul class="breadcrumb">
+  <li><a href="/Workflow/">Workflows</a> <span class="divider">/</span></li>
+  <li><a href="{{workflowDAG.workflow.url }}">{{workflowDAG.workflow}}</a> <span class="divider">/</span></li>
+  <li class="active">Visualize</li>
+</ul>
+
+<hr>
+<embed src="{% url 'visualize_as_img' workflowDAG.workflow.id %}" type="image/svg+xml"></embed>
+
+
+{{workflowDAGx}}
+
+
+
+{%endblock%}

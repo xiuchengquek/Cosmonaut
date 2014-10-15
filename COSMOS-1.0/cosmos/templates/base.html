@@ -1,0 +1,86 @@
+{% load extras %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+      <link rel="icon" type="image/png" href="{% static "img/favicon2.ico" %}">
+    <title>Cosmos {%block title%}{%endblock%}</title>
+    <!-- Bootstrap -->
+      <!--
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static "css/spacelab.bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "bootstrap/css/bootstrap-responsive.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/base.css" %}" rel="stylesheet">
+      -->
+
+      <!-- start: CSS -->
+      <link id="bootstrap-style" href="{% static "bootstrap/optimus_css/bootstrap.css" %}" rel="stylesheet">
+      <link href="{% static "bootstrap/optimus_css/bootstrap-responsive.min.css" %}" rel="stylesheet">
+      <link id="base-style" href="{% static "bootstrap/optimus_css/style.css" %}" rel="stylesheet">
+      <link id="base-style-responsive" href="{% static "bootstrap/optimus_css/style-responsive.css" %}" rel="stylesheet">
+      <link href="{% static "css/base.css" %}" rel="stylesheet">
+      <!-- end: CSS -->
+
+      <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+      <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <![endif]-->
+
+      <!--
+      Multi-column definitions
+      http://www.triballabs.net/2012/08/multi-column-bootstrap-definition-lists-using-jquery-html-css/
+      -->
+      <link href="{%static "tribal/tribal-form.css" %}" rel="stylesheet" />
+      <script type="text/javascript" src="{% static "tribal/tribal-shared.js" %}"></script>
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+      {%block style%}{%endblock%}
+    </style>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript">
+    $(function() {
+	    $('[rel=tooltip]').tooltip()
+    });
+    </script>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/Workflow/">
+              <img src="{% static "img/logo.png" %}">
+              Cosmos</a>
+          <div class="nav-collapse collapse pull-right">
+            <ul class="nav">
+              <li class="{% navactive request "home"%}"><a href="/"><i class="icon-home"></i> Home</a></li>
+              <li class="{% navactive request "Workflow"%}"><a href="/Workflow/"><i class="icon-retweet"></i> Workflows</a></li>
+              {%if cosmos_settings.DRM == 'GE'%}
+              <li class="{% navactive request "GridEngine"%}"><a href="/GridEngine/"><i class="icon-retweet"></i> GridEngine</a></li>
+              {%endif%}
+              {%if cosmos_settings.DRM == 'LSF'%}
+              <li class="{% navactive request "LSF"%}"><a href="/LSF/"><i class="icon-briefcase"></i> LSF</a></li>
+              {%endif%}
+              <li class="{% navactive request "doc"%}"><a href="http://bioseq.info/docs/Cosmos" target="_NEW"><i class="icon-folder-open"></i> Documentation</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+        {%block content%}{%endblock%}
+        <hr>
+        <footer>
+            <p>COSMOS is © 2012-2014 Harvard Medical School.  <b>Do not distribute.</b></p>
+        </footer>
+    </div>
+  </body>
+</html>

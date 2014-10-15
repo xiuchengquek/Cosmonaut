@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load extras %}
+{%block title%} - {{workflow.name}}{%endblock%}
+{% block head %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        update_html = function(selector,url){
+            //updates selector with the html from url every second
+                jQuery.ajax({
+                     url:    url,
+                     success: function(result) {
+                                  $(selector).html(result),
+                                  setTimeout("update_html('"+selector+"','"+url+"')",1000)
+                              },
+                     async:   true,
+                }); 
+            }
+        update_html('#stages','{% url 'workflow_stage_table' workflow.id %}')
+    });
+    </script>
+{% endblock %}
+{%block content%}
+
+<ul class="breadcrumb">
+  <li><a href="/Workflow/">Workflows</a> <span class="divider">/</span></li>
+  <li class="active">{{workflow}}</li>
+</ul>
+
+
+<div class="box-header">
+    <h2><i class="icon-retweet"></i><span class="break"></span> {{workflow}}</h2>
+    <div class="box-icon">
+        <a href="{% url 'workflow_view_log' workflow.id %}" class="btn btn-mini btn-success" rel="tooltip" title="View Log">
+            <i class="icon-search"></i> </a>
+    </div>
+
+    <div class="box-icon">
+        <a href="{% url 'workflow_analysis' workflow.id %}" class="btn btn-mini btn-info" rel="tooltip" title="Analyse">
+            <i class="icon-wrench"></i> </a>
+    </div>
+    <div class="box-icon">
+        <a href="{% url 'workflow_visualize' workflow.id %}" class="btn btn-mini btn-danger" rel="tooltip" title="Visualise DAG">
+            <i class="icon-eye-open "></i> </a>
+    </div>
+</div>
+<div class="box-content">
+    <dl class="dl-horizontal dl-multicolumn" data-colcount="2">
+    <dt>Output Dir</dt><dd>{{workflow.output_dir}}</dd>
+    <dt>Default Queue</dt><dd>
+        {% if workflow.default_queue %}{{workflow.default_queue}}
+        {% else %} None
+        {% endif %}</dd>
+    <dt>Max Reattempts</dt><dd>{{workflow.max_reattempts}}</dd>
+    <dt>Delete Intermediates</dt><dd>{{workflow.delete_intermediates}}</dd>
+    <dt>Created on</dt><dd>{{workflow.created_on}}</dd>
+    <dt>Finished on</dt><dd>{{workflow.finished_on}}</dd>
+    <dt>Wall Time</dt><dd>{{workflow.wall_time.seconds|format_time}}</dd>
+    <dt>Comments</dt><dd>{{workflow.comments|safe}}</dd>
+    </dl>
+
+
+<div class="box-header">
+    <h2><i class="icon-tasks"></i><span class="break"></span>Stages</h2>
+</div>
+<div id="stages" class="box-content">
+{%with stages=stages_ordered%}
+    {%include "Workflow/Stage/table.html"%}
+{%endwith%}
+</div>
+
+</div>
+<br/>
+{%endblock%}
